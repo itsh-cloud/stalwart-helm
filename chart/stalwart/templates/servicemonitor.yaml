@@ -17,7 +17,7 @@ spec:
       - {{ .Release.Namespace }}
   endpoints:
     - port: metrics
-      path: /metrics
+      path: /metrics/prometheus
       interval: {{ .Values.metrics.serviceMonitor.interval | default "30s" }}
       {{- if .Values.metrics.serviceMonitor.basicAuth }}
       basicAuth:
