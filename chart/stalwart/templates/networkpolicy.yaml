@@ -1,0 +1,32 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "stalwart.fullname" . }}
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "stalwart.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    {{- $publicPorts := .Values.networkPolicy.publicPorts }}
+    {{- if not $publicPorts }}
+    {{- $publicPorts = list }}
+    {{- range $name, $port := .Values.service.ports }}
+    {{- $publicPorts = append $publicPorts $port }}
+    {{- end }}
+    {{- end }}
+    {{- if $publicPorts }}
+    - ports:
+        {{- range $publicPorts }}
+        - protocol: TCP
+          port: {{ . }}
+        {{- end }}
+    {{- end }}
+    {{- with .Values.networkPolicy.managementAPI.rules }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

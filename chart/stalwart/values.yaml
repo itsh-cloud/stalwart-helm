@@ -122,10 +122,16 @@ config:
     internal:
       type: "internal"
       store: "rocksdb"
-  authentication:
-    fallback-admin:
-      user: "admin"
-      secret: "changeme"
+  # authentication.fallback-admin must be configured before installing.
+  # No default is provided to prevent accidentally deploying with publicly-known credentials.
+  # Set authentication.fallback-admin.secret to a strong password (or reference an env-var
+  # via "%{env:VAR}" syntax and supply VAR via envFrom below), or remove the fallback-admin
+  # block entirely if you have other admin auth configured.
+  # Example:
+  # authentication:
+  #   fallback-admin:
+  #     user: "admin"
+  #     secret: "%{env:STALWART_FALLBACK_ADMIN_SECRET}"
   tracer:
     stdout:
       enable: true
@@ -170,3 +176,25 @@ extraVolumes: []
 
 # -- Init containers
 initContainers: []
+
+# -- Optional NetworkPolicy.
+# When enabled, restricts ingress to the public mail protocols (and the management API
+# only from the namespace selectors / pod selectors you specify). Default: disabled to
+# preserve backward compatibility — explicitly opt in by setting `networkPolicy.enabled: true`.
+networkPolicy:
+  enabled: false
+  # -- Ports allowed from anywhere (mail protocols, public-facing).
+  # Defaults to the mail protocol ports defined under .Values.service.ports.
+  publicPorts: []
+  # -- Ingress rules for the management HTTP API (port 8080).
+  # Provide namespaceSelector/podSelector blocks; leaving empty disables management ingress.
+  managementAPI:
+    # Example:
+    # - from:
+    #     - namespaceSelector:
+    #         matchLabels:
+    #           kubernetes.io/metadata.name: cpbackend
+    #   ports:
+    #     - protocol: TCP
+    #       port: 8080
+    rules: []

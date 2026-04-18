@@ -1,4 +1,17 @@
 {{- if .Values.config }}
+{{- $auth := dict }}
+{{- if hasKey .Values.config "authentication" }}{{ $auth = index .Values.config "authentication" }}{{ end }}
+{{- $fa := dict }}
+{{- if hasKey $auth "fallback-admin" }}{{ $fa = index $auth "fallback-admin" }}{{ end }}
+{{- if kindIs "map" $fa }}
+{{- $secret := index $fa "secret" }}
+{{- if not $secret }}
+{{- fail "config.authentication.fallback-admin.secret must be set (use a strong password or '%{env:VAR}' reference). See chart values.yaml for guidance." }}
+{{- end }}
+{{- if eq (toString $secret) "changeme" }}
+{{- fail "config.authentication.fallback-admin.secret is set to the placeholder 'changeme'. Pick a real password or use an env-var reference." }}
+{{- end }}
+{{- end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
