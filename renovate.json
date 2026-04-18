@@ -7,7 +7,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["chart/stalwart/Chart\\.yaml$"],
+      "managerFilePatterns": [
+        "/chart/stalwart/Chart\\.yaml$/"
+      ],
       "matchStrings": ["appVersion: \"(?<currentValue>.+?)\""],
       "depNameTemplate": "stalwartlabs/stalwart",
       "datasourceTemplate": "docker",
