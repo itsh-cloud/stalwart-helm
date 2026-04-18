@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended"
   ],
+  "platformAutomerge": true,
   "customManagers": [
     {
       "customType": "regex",
@@ -11,6 +12,25 @@
       "depNameTemplate": "stalwartlabs/stalwart",
       "datasourceTemplate": "docker",
       "extractVersionTemplate": "^v(?<version>.+)-alpine$"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Auto-merge patch updates of all deps once CI passes.",
+      "matchUpdateTypes": ["patch", "digest", "pin", "pinDigest"],
+      "automerge": true
+    },
+    {
+      "description": "Stalwart server is the chart's whole purpose — every bump (incl. patch) needs human review since it's a deployed mail server.",
+      "matchPackageNames": ["stalwartlabs/stalwart"],
+      "automerge": false,
+      "addLabels": ["needs-review"]
+    },
+    {
+      "description": "Minor and major bumps are reviewed manually.",
+      "matchUpdateTypes": ["minor", "major"],
+      "automerge": false,
+      "addLabels": ["needs-review"]
     }
   ]
 }
