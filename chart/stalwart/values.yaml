@@ -17,6 +17,10 @@ replicas: 1
 service:
   type: ClusterIP
   annotations: {}
+  # -- externalTrafficPolicy for LoadBalancer/NodePort services. Set to "Local"
+  # to preserve the upstream source address (e.g. so PROXY-protocol
+  # trusted-networks can be restricted to the load balancer's IP).
+  # externalTrafficPolicy: Local
   ports:
     smtp: 25
     submission: 587
