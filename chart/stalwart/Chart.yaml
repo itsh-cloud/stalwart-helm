@@ -3,7 +3,7 @@ name: stalwart
 description: Helm chart for Stalwart Mail Server with YAML-to-TOML config conversion
 type: application
 version: 0.2.1
-appVersion: "0.15.5"
+appVersion: "0.16.17"
 kubeVersion: ">= 1.26.0"
 home: https://github.com/an0nfunc/stalwart-helm
 sources:
