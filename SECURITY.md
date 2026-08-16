@@ -8,7 +8,7 @@ If you discover a security vulnerability in stalwart-helm, please report it resp
 
 Instead, please send a report via GitHub's private vulnerability reporting feature:
 
-1. Go to the [Security tab](https://github.com/an0nfunc/stalwart-helm/security) of this repository.
+1. Go to the [Security tab](https://github.com/itsh-cloud/stalwart-helm/security) of this repository.
 2. Click "Report a vulnerability".
 3. Provide a description of the vulnerability and steps to reproduce.
 

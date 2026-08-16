@@ -1,8 +1,8 @@
 # stalwart-helm
 
-[![CI](https://github.com/an0nfunc/stalwart-helm/actions/workflows/ci.yaml/badge.svg)](https://github.com/an0nfunc/stalwart-helm/actions/workflows/ci.yaml)
-[![License](https://img.shields.io/github/license/an0nfunc/stalwart-helm)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/an0nfunc/stalwart-helm)](https://github.com/an0nfunc/stalwart-helm/releases)
+[![CI](https://github.com/itsh-cloud/stalwart-helm/actions/workflows/ci.yaml/badge.svg)](https://github.com/itsh-cloud/stalwart-helm/actions/workflows/ci.yaml)
+[![License](https://img.shields.io/github/license/itsh-cloud/stalwart-helm)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/itsh-cloud/stalwart-helm)](https://github.com/itsh-cloud/stalwart-helm/releases)
 
 Helm chart for [Stalwart Mail Server](https://stalw.art/) with YAML-to-TOML config conversion.
 
@@ -22,7 +22,7 @@ Helm chart for [Stalwart Mail Server](https://stalw.art/) with YAML-to-TOML conf
 ## Quick Start
 
 ```bash
-helm install stalwart oci://ghcr.io/an0nfunc/stalwart-helm/chart \
+helm install stalwart oci://ghcr.io/itsh-cloud/charts/stalwart \
   --namespace mail --create-namespace \
   --set config.server.hostname=mail.example.com
 ```
@@ -30,7 +30,7 @@ helm install stalwart oci://ghcr.io/an0nfunc/stalwart-helm/chart \
 Or from source:
 
 ```bash
-git clone https://github.com/an0nfunc/stalwart-helm.git
+git clone https://github.com/itsh-cloud/stalwart-helm.git
 helm install stalwart ./stalwart-helm/chart/stalwart \
   --namespace mail --create-namespace
 ```
@@ -119,7 +119,7 @@ See the [examples/](examples/) directory for ready-to-use value files:
 - [`s3-blob-storage.yaml`](examples/s3-blob-storage.yaml) - S3 for blob storage with env var secrets
 
 ```bash
-helm install stalwart oci://ghcr.io/an0nfunc/stalwart-helm/chart \
+helm install stalwart oci://ghcr.io/itsh-cloud/charts/stalwart \
   -f examples/s3-blob-storage.yaml \
   --namespace mail --create-namespace
 ```

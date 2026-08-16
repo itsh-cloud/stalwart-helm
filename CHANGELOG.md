@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.2.2
+
+- The project moved from `an0nfunc` to the `itsh-cloud` organisation. A GitHub
+  transfer redirects the repository and the git remote, but it does **not** move
+  GHCR packages, so `oci://ghcr.io/an0nfunc/stalwart-helm/chart/stalwart` is
+  frozen at v0.2.1 and will never receive another version.
+
+  **Migration:** pull from `oci://ghcr.io/itsh-cloud/charts/stalwart` instead.
+  Chart contents are unchanged, so this is a source swap, not an upgrade.
+- The README's install command was missing the chart name and could never
+  resolve. Releases also now fail fast if `Chart.yaml` and the tag disagree.
+
+## v0.2.1
+
+- The service now supports `externalTrafficPolicy`, so deployments that need
+  the client IP preserved can set it to `Local`.
+
 ## v0.2.0
 
 ### Breaking

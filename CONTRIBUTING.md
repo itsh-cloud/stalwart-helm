@@ -5,7 +5,7 @@ Thank you for your interest in contributing!
 ## Development Setup
 
 1. **Prerequisites**: `helm`, `just`
-2. **Clone**: `git clone https://github.com/an0nfunc/stalwart-helm.git`
+2. **Clone**: `git clone https://github.com/itsh-cloud/stalwart-helm.git`
 3. **Lint**: `just lint`
 4. **Template**: `just template`
 
