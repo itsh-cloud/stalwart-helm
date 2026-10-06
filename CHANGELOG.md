@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.2
+
+- The default image is Stalwart 0.16.25 (`appVersion`, was 0.16.19).
+
 ## v0.4.1
 
 - `args` now defaults to `--config <configPath>`. 0.16 dropped the entrypoint
