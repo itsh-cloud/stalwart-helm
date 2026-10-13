@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.3
+
+- The default image is Stalwart 0.16.26 (`appVersion`, was 0.16.25).
+
 ## v0.4.2
 
 - The default image is Stalwart 0.16.25 (`appVersion`, was 0.16.19).
