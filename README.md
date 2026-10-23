@@ -187,3 +187,5 @@ When updating the `config:` section, the StatefulSet will automatically roll due
 ## License
 
 Apache 2.0 - see [LICENSE](LICENSE).
+
+Built and maintained by [ITSH](https://itsh.dev), where it runs in production.

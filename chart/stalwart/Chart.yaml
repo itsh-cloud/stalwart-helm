@@ -19,3 +19,7 @@ keywords:
   - imap
   - jmap
   - email
+annotations:
+  artifacthub.io/links: |
+    - name: ITSH
+      url: https://itsh.dev
