@@ -3,7 +3,7 @@ name: stalwart
 description: Helm chart for Stalwart Mail Server (0.16+ datastore config model)
 type: application
 version: 0.4.3
-appVersion: "0.16.26"
+appVersion: "0.16.27"
 kubeVersion: ">= 1.26.0"
 home: https://github.com/itsh-cloud/stalwart-helm
 sources:
