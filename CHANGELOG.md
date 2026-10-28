@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.4
+
+- `service.publishNotReadyAddresses` keeps not-ready pods in the Service
+  endpoints. With a single replica this keeps the pod reachable when the
+  control plane marks it unready although it still serves. With several
+  replicas it also sends traffic to pods that are starting, terminating or
+  failing their readiness probe.
+- The default image is Stalwart 0.16.27 (`appVersion`, was 0.16.26).
+
 ## v0.4.3
 
 - The default image is Stalwart 0.16.26 (`appVersion`, was 0.16.25).
