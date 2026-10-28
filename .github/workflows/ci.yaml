@@ -45,6 +45,17 @@ jobs:
           helm template stalwart chart/stalwart --set metrics.enabled=true \
             | grep -q "name: stalwart-metrics"
 
+      - name: Assert publishNotReadyAddresses renders only when enabled
+        run: |
+          helm template stalwart chart/stalwart --show-only templates/service.yaml \
+            --set service.publishNotReadyAddresses=true \
+            | grep -q "publishNotReadyAddresses: true"
+          if helm template stalwart chart/stalwart --show-only templates/service.yaml \
+            | grep -q publishNotReadyAddresses; then
+            echo "::error::publishNotReadyAddresses rendered by default" >&2
+            exit 1
+          fi
+
       - name: Helm template (examples)
         run: |
           for f in examples/*.yaml; do

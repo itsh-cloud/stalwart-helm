@@ -108,6 +108,7 @@ server that starts cleanly against an empty store.
 | `replicas` | `1` | Number of replicas |
 | `service.type` | `ClusterIP` | Service type (`ClusterIP`, `LoadBalancer`, `NodePort`) |
 | `service.annotations` | `{}` | Service annotations (e.g., cloud LB config) |
+| `service.publishNotReadyAddresses` | `false` | Keep not-ready pods in the Service endpoints |
 | `service.ports` | smtp/submission/imap/imaps/https | Exposed ports |
 | `ingress.enabled` | `false` | Enable Ingress for management UI |
 | `httpRoute.enabled` | `false` | Enable Gateway API HTTPRoute for management UI |

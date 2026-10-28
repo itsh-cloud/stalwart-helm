@@ -13,6 +13,9 @@ spec:
   {{- with .Values.service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ . }}
   {{- end }}
+  {{- if .Values.service.publishNotReadyAddresses }}
+  publishNotReadyAddresses: true
+  {{- end }}
   selector:
     {{- include "stalwart.selectorLabels" . | nindent 4 }}
   ports:

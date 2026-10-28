@@ -36,8 +36,14 @@ check-metrics-name:
     helm template stalwart chart/stalwart --set metrics.enabled=true | grep -q "name: stalwart-metrics"
     @echo "metrics Service name OK"
 
+# Assert publishNotReadyAddresses renders on the Service only when enabled.
+check-publish-not-ready:
+    helm template stalwart chart/stalwart --show-only templates/service.yaml --set service.publishNotReadyAddresses=true | grep -q "publishNotReadyAddresses: true"
+    ! helm template stalwart chart/stalwart --show-only templates/service.yaml | grep -q publishNotReadyAddresses
+    @echo "publishNotReadyAddresses OK"
+
 # Validate rendered templates with kubeconform
-test: check-config check-metrics-name
+test: check-config check-metrics-name check-publish-not-ready
     helm template stalwart chart/stalwart | kubeconform -strict -ignore-missing-schemas
     @for f in examples/*.yaml; do \
         echo "--- Validating with $f ---"; \

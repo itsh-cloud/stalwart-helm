@@ -21,6 +21,12 @@ service:
   # to preserve the upstream source address (e.g. so PROXY-protocol
   # trusted-networks can be restricted to the load balancer's IP).
   # externalTrafficPolicy: Local
+  # -- Keep endpoints in the Service while their pods are not ready. With one
+  # replica this keeps the pod reachable when the control plane marks it
+  # unready although it still serves (e.g. a lost node heartbeat). With several
+  # replicas it also sends traffic to pods that are starting, terminating or
+  # failing their readiness probe.
+  # publishNotReadyAddresses: true
   ports:
     smtp: 25
     submission: 587
