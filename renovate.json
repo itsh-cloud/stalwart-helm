@@ -62,6 +62,13 @@
       ]
     },
     {
+      "description": "The chart renders the 0.16 datastore configuration. Stalwart 1.0 uses a new configuration schema and cannot open a 0.16 data store, so upgrading means copying into a new store with stalwart-migrate. That needs a new chart major rather than an appVersion bump. Raise this limit with that major.",
+      "matchPackageNames": [
+        "stalwartlabs/stalwart"
+      ],
+      "allowedVersions": "<1"
+    },
+    {
       "description": "Minor and major bumps are reviewed manually.",
       "matchUpdateTypes": [
         "minor",
