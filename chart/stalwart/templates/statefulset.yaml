@@ -1,3 +1,6 @@
+{{- if and .Values.persistence.existingClaim (not .Values.persistence.enabled) }}
+{{- fail "persistence.existingClaim is set but persistence.enabled is false, so the claim would not be mounted and Stalwart would start on an empty store. Set persistence.enabled to true or unset existingClaim." }}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -149,6 +152,11 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
+        {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}
+        {{- end }}
         {{- if .Values.config }}
         - name: config
           configMap:
@@ -157,7 +165,7 @@ spec:
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-  {{- if .Values.persistence.enabled }}
+  {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
   volumeClaimTemplates:
     - metadata:
         name: data

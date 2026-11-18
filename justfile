@@ -42,8 +42,43 @@ check-publish-not-ready:
     ! helm template stalwart chart/stalwart --show-only templates/service.yaml | grep -q publishNotReadyAddresses
     @echo "publishNotReadyAddresses OK"
 
+# Assert persistence.existingClaim replaces the volumeClaimTemplate with that
+# claim and mounts it at dataPath like the template, since a store mounted
+# anywhere else leaves Stalwart starting on an empty directory.
+check-existing-claim:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    check='
+    import sys, yaml
+    claim, path = sys.argv[1:]
+    sts = next(d for d in yaml.safe_load_all(sys.stdin) if d and d.get("kind") == "StatefulSet")
+    pod = sts["spec"]["template"]["spec"]
+    mounts = [m["mountPath"] for m in pod["containers"][0]["volumeMounts"] if m["name"] == "data"]
+    assert mounts == [path], f"data mounted at {mounts}, want {path}"
+    vols = [v for v in pod.get("volumes") or [] if v["name"] == "data"]
+    vcts = sts["spec"].get("volumeClaimTemplates") or []
+    if claim:
+        assert [v["persistentVolumeClaim"]["claimName"] for v in vols] == [claim], vols
+        assert not vcts, "volumeClaimTemplates rendered although existingClaim is set"
+    else:
+        assert not vols, "data pod volume rendered although existingClaim is unset"
+        assert [t["metadata"]["name"] for t in vcts] == ["data"], vcts
+    '
+    helm template stalwart chart/stalwart | python3 -c "$check" "" /var/lib/stalwart
+    helm template stalwart chart/stalwart --set persistence.existingClaim=mail-data \
+        | python3 -c "$check" mail-data /var/lib/stalwart
+    helm template stalwart chart/stalwart --set persistence.existingClaim=mail-data --set dataPath=/data \
+        | python3 -c "$check" mail-data /data
+    if out=$(helm template stalwart chart/stalwart --set persistence.existingClaim=mail-data \
+        --set persistence.enabled=false 2>&1); then
+        echo "existingClaim rendered with persistence disabled" >&2
+        exit 1
+    fi
+    grep -q "persistence.existingClaim is set" <<<"$out"
+    echo "existingClaim OK"
+
 # Validate rendered templates with kubeconform
-test: check-config check-metrics-name check-publish-not-ready
+test: check-config check-metrics-name check-publish-not-ready check-existing-claim
     helm template stalwart chart/stalwart | kubeconform -strict -ignore-missing-schemas
     @for f in examples/*.yaml; do \
         echo "--- Validating with $f ---"; \

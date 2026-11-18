@@ -62,6 +62,12 @@ httpRoute:
 # -- Persistent storage for RocksDB metadata
 persistence:
   enabled: true
+  # -- Mount this existing PVC as the data volume instead of creating one from a
+  # volumeClaimTemplate. It mounts at dataPath either way. volumeClaimTemplates
+  # is immutable on a StatefulSet, so switching an installed release between
+  # the two means deleting the StatefulSet first. storageClass, size and
+  # annotations apply only to the template.
+  existingClaim: ""
   storageClass: ""
   size: 50Gi
   annotations: {}

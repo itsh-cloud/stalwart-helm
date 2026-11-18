@@ -1,0 +1,22 @@
+# Run Stalwart on a PersistentVolumeClaim you created yourself, such as one
+# holding a store copied from another server, instead of having the
+# StatefulSet create one from its volumeClaimTemplate.
+#
+# The claim mounts at dataPath, the same place the template volume would, so
+# config.path has to point there too. The chart renders no
+# volumeClaimTemplates in this mode, and since that field is immutable on a
+# StatefulSet, moving an installed release onto a claim means deleting the
+# StatefulSet first:
+#
+#   kubectl -n mail delete statefulset stalwart --cascade=orphan
+#   helm upgrade stalwart . -f examples/existing-claim.yaml
+
+config:
+  "@type": RocksDb
+  path: /var/lib/stalwart
+
+dataPath: /var/lib/stalwart
+
+persistence:
+  enabled: true
+  existingClaim: stalwart-data
