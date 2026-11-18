@@ -30,8 +30,7 @@ Helm chart for [Stalwart Mail Server](https://stalw.art/).
 
 ```bash
 helm install stalwart oci://ghcr.io/itsh-cloud/charts/stalwart \
-  --namespace mail --create-namespace \
-  --set config.server.hostname=mail.example.com
+  --namespace mail --create-namespace
 ```
 
 Or from source:
@@ -48,6 +47,12 @@ Access the admin UI:
 kubectl -n mail port-forward svc/stalwart 8080:8080
 # Open http://localhost:8080
 ```
+
+The server's hostname is not a chart value. It is `defaultHostname` in the
+datastore's `SystemSettings`, set in the admin UI or with `stalwart-cli` (see
+[Applying the rest of the configuration](#applying-the-rest-of-the-configuration)).
+While it is empty, Stalwart uses the `STALWART_HOSTNAME` environment variable,
+or the pod's hostname when that is unset too.
 
 ## Configuration
 
@@ -163,11 +168,11 @@ See the [examples/](examples/) directory for ready-to-use value files:
 
 - [`minimal.yaml`](examples/minimal.yaml) - Bare minimum override
 - [`existing-claim.yaml`](examples/existing-claim.yaml) - Data store on a PVC you created, such as a migrated one
-- [`s3-blob-storage.yaml`](examples/s3-blob-storage.yaml) - S3 for blob storage with env var secrets
+- [`recovery-bootstrap.yaml`](examples/recovery-bootstrap.yaml) - First boot in recovery mode to apply the configuration
 
 ```bash
 helm install stalwart oci://ghcr.io/itsh-cloud/charts/stalwart \
-  -f examples/s3-blob-storage.yaml \
+  -f examples/minimal.yaml \
   --namespace mail --create-namespace
 ```
 
