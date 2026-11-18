@@ -1,4 +1,4 @@
-# First boot of a fresh or freshly migrated 0.16 server.
+# First boot of a fresh or freshly migrated server.
 #
 # Recovery mode disables every background service and exposes only the
 # management listener, so configuration can be applied to a server that has

@@ -1,4 +1,4 @@
-# Minimal Stalwart 0.16 deployment.
+# Minimal Stalwart deployment.
 #
 # config.json carries the datastore and nothing else. Everything a mail server
 # actually needs (listeners, TLS, domains, accounts, spam filtering) lives inside
