@@ -6,15 +6,15 @@
 
 Helm chart for [Stalwart Mail Server](https://stalw.art/).
 
-> **Chart 0.4.0 targets Stalwart 0.16+.** 0.16 replaced the TOML configuration
-> file with a datastore-backed model, so the YAML-to-TOML conversion that earlier
-> chart versions provided no longer has anything to convert. Deployments still on
-> Stalwart 0.15.x should stay on chart 0.3.x. `helm upgrade` alone does **not**
-> migrate a 0.15 deployment: see [UPGRADING/v0_16.md](https://github.com/stalwartlabs/stalwart/blob/main/UPGRADING/v0_16.md).
+> **Chart 0.5.0 targets Stalwart 1.x.** Stalwart 1.0 cannot open a 0.16 data
+> store, so `helm upgrade` alone does **not** move a 0.16 deployment to it: see
+> [Upgrading from Stalwart 0.16](#upgrading-from-stalwart-016). Deployments on
+> Stalwart 0.16 should stay on chart 0.4.x until they migrate, and deployments
+> on 0.15.x on chart 0.3.x.
 
 ## Features
 
-- **Datastore bootstrap** - `config` renders to the small `config.json` that 0.16 reads at startup, with schema validation on the tagged union so a misspelled `@type` fails at render rather than at pod start.
+- **Datastore bootstrap** - `config` renders to the small `config.json` that Stalwart reads at startup, with schema validation on the tagged union so a misspelled `@type` fails at render rather than at pod start.
 - **Recovery mode** - first-class support for booting with only the management listener to apply configuration to a server that cannot start normally.
 - **StatefulSet** with RocksDB persistence and health probes (startup, liveness, readiness)
 - **Optional Prometheus metrics** with ServiceMonitor support (including BasicAuth)
@@ -99,6 +99,28 @@ mount and point `config.path` at the same place. Rewriting the path is not
 required, and a mismatch between the two is the documented way to end up with a
 server that starts cleanly against an empty store.
 
+`persistence.existingClaim` mounts a PersistentVolumeClaim you created instead
+of the one the StatefulSet would create from its volumeClaimTemplate. It mounts
+at `dataPath` like the template volume, so `config.path` stays the same.
+
+### Metrics
+
+`metrics.enabled` adds a Service on the management port, and
+`metrics.serviceMonitor.enabled` a ServiceMonitor that scrapes
+`/metrics/prometheus`. Stalwart serves that endpoint only once the Prometheus
+exporter is enabled in the datastore, in the `prometheus` field of the
+`Metrics` object (`"@type": "Enabled"`). It is `Disabled` by default, and until
+it is enabled the ServiceMonitor scrapes nothing. If the exporter sets
+`authUsername` and `authSecret`, give the same credentials to
+`metrics.serviceMonitor.basicAuth`.
+
+Since Stalwart 1.0 the metric names follow the Prometheus conventions
+(`stalwart_*` with unit and `_total` suffixes), so dashboards and alerts written
+for 0.16 need updating. The `OTEL_*` environment variables are ignored on 1.x:
+the OpenTelemetry service name, namespace and resource attributes are the
+`serviceName`, `serviceNamespace` and `resourceAttributes` settings of the
+`Metrics` object.
+
 ## Configuration
 
 | Key | Default | Description |
@@ -114,6 +136,7 @@ server that starts cleanly against an empty store.
 | `ingress.enabled` | `false` | Enable Ingress for management UI |
 | `httpRoute.enabled` | `false` | Enable Gateway API HTTPRoute for management UI |
 | `persistence.enabled` | `true` | Enable persistent storage |
+| `persistence.existingClaim` | `""` | Mount this PVC at `dataPath` instead of rendering a volumeClaimTemplate |
 | `persistence.storageClass` | `""` | Storage class |
 | `persistence.size` | `50Gi` | Volume size |
 | `metrics.enabled` | `false` | Enable Prometheus metrics service |
@@ -139,6 +162,7 @@ See [values.yaml](chart/stalwart/values.yaml) for all available options.
 See the [examples/](examples/) directory for ready-to-use value files:
 
 - [`minimal.yaml`](examples/minimal.yaml) - Bare minimum override
+- [`existing-claim.yaml`](examples/existing-claim.yaml) - Data store on a PVC you created, such as a migrated one
 - [`s3-blob-storage.yaml`](examples/s3-blob-storage.yaml) - S3 for blob storage with env var secrets
 
 ```bash
@@ -167,7 +191,7 @@ Kubernetes has no field for it, wrap the entrypoint:
 ```yaml
 command: ["/bin/sh", "-c"]
 args:
-  - exec /usr/local/bin/stalwart --config /opt/stalwart/etc/config.toml
+  - exec /usr/local/bin/stalwart --config /etc/stalwart/config.json
 ```
 
 with the limit applied first:
@@ -175,7 +199,7 @@ with the limit applied first:
 ```yaml
 command: ["/bin/sh", "-c"]
 args:
-  - ulimit -n 65535 && exec /usr/local/bin/stalwart --config /opt/stalwart/etc/config.toml
+  - ulimit -n 65535 && exec /usr/local/bin/stalwart --config /etc/stalwart/config.json
 ```
 
 The binary and config paths must match the image, so re-check them when changing
@@ -185,6 +209,29 @@ every workload on the node rather than this one.
 ## Upgrading
 
 When updating the `config:` section, the StatefulSet will automatically roll due to a config checksum annotation on the pod template.
+
+### Upgrading from Stalwart 0.16
+
+Stalwart 1.0 redesigned the database layout and refuses to open a store written
+by 0.16, so there is no in-place upgrade. Copy the data into a new store with
+[`stalwart-migrate`](https://stalw.art/docs/migration/upgrade-0-16/) and run
+1.x on that:
+
+1. Run Stalwart 0.16.27, the release `stalwart-migrate` copies from. It is the
+   default image of chart 0.4.4.
+2. Create a new PersistentVolumeClaim for the 1.x store and copy into it with
+   `stalwart-migrate`, for example from a Job that mounts both claims. The new
+   files must belong to the image's user (uid and gid 2000). Use the tool's
+   `-oss` build when the 1.x image is compiled without the `enterprise`
+   feature: 1.x refuses a store written for the other edition.
+3. Install this chart with `persistence.existingClaim` set to the new claim,
+   and `config.path` pointing at `dataPath`. A volumeClaimTemplate is
+   immutable, so delete the existing StatefulSet first
+   (`kubectl delete statefulset <name> --cascade=orphan`) and let
+   `helm upgrade` recreate it.
+
+The 0.16 claim is left as it was, which keeps the way back to chart 0.4.x open
+until the new store is verified.
 
 ## License
 

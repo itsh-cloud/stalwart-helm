@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.5.0
+
+### Breaking
+
+The default image is Stalwart 1.1.1 (`appVersion`, was 0.16.27). Stalwart 1.0
+redesigned the database layout and refuses to open a store written by 0.16, so
+`helm upgrade` of a 0.16 deployment starts a server that cannot read its data.
+Copy the store into a new one with `stalwart-migrate` and mount that with
+`persistence.existingClaim`, as the README's "Upgrading from Stalwart 0.16"
+describes, or stay on v0.4.x.
+
+- Metric names follow the Prometheus conventions (`stalwart_*` with unit and
+  `_total` suffixes). The ServiceMonitor still scrapes `/metrics/prometheus`,
+  but 1.x serves it only once the Prometheus exporter is enabled in the
+  datastore (`Metrics.prometheus`).
+- `OTEL_*` environment variables are ignored. The OpenTelemetry service name,
+  namespace and resource attributes are settings of the `Metrics` object.
+
+### Added
+
+- `persistence.existingClaim` mounts an existing PersistentVolumeClaim as the
+  data volume, at `dataPath` like the template volume, and the StatefulSet
+  renders no `volumeClaimTemplates`. Render fails if it is set while
+  `persistence.enabled` is false, since the claim would not be mounted.
+
 ## v0.4.4
 
 - `service.publishNotReadyAddresses` keeps not-ready pods in the Service
