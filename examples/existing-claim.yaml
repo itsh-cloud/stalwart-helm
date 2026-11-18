@@ -9,7 +9,7 @@
 # StatefulSet first:
 #
 #   kubectl -n mail delete statefulset stalwart --cascade=orphan
-#   helm upgrade stalwart . -f examples/existing-claim.yaml
+#   helm upgrade stalwart chart/stalwart -f examples/existing-claim.yaml
 
 config:
   "@type": RocksDb
