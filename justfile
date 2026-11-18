@@ -69,6 +69,8 @@ check-existing-claim:
         | python3 -c "$check" mail-data /var/lib/stalwart
     helm template stalwart chart/stalwart --set persistence.existingClaim=mail-data --set dataPath=/data \
         | python3 -c "$check" mail-data /data
+    helm template stalwart chart/stalwart --set-string persistence.existingClaim=12345 \
+        | python3 -c "$check" 12345 /var/lib/stalwart
     if out=$(helm template stalwart chart/stalwart --set persistence.existingClaim=mail-data \
         --set persistence.enabled=false 2>&1); then
         echo "existingClaim rendered with persistence disabled" >&2
