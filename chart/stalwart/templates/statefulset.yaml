@@ -155,7 +155,7 @@ spec:
         {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim }}
+            claimName: {{ .Values.persistence.existingClaim | quote }}
         {{- end }}
         {{- if .Values.config }}
         - name: config
