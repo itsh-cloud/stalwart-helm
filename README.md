@@ -225,10 +225,13 @@ by 0.16, so there is no in-place upgrade. Copy the data into a new store with
 1. Run Stalwart 0.16.27, the release `stalwart-migrate` copies from. It is the
    default image of chart 0.4.4.
 2. Create a new PersistentVolumeClaim for the 1.x store and copy into it with
-   `stalwart-migrate`, for example from a Job that mounts both claims. The new
-   files must belong to the image's user (uid and gid 2000). Use the tool's
-   `-oss` build when the 1.x image is compiled without the `enterprise`
-   feature: 1.x refuses a store written for the other edition.
+   `stalwart-migrate`, for example from a Job that mounts both claims. The
+   claim's root directory and every file in it must be writable by the image's
+   user (uid and gid 2000). A fresh volume's root is owned by root, so either
+   run the Job as that user with `fsGroup: 2000`, or set
+   `podSecurityContext.fsGroup: 2000` on this chart. Use the tool's `-oss` build
+   when the 1.x image is compiled without the `enterprise` feature: 1.x refuses
+   a store written for the other edition.
 3. Install this chart with `persistence.existingClaim` set to the new claim,
    and `config.path` pointing at `dataPath`. A volumeClaimTemplate is
    immutable, so delete the existing StatefulSet first
